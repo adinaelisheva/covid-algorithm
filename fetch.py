@@ -1,3 +1,5 @@
+# Modified from https://github.com/harrislapiroff/mwra-wastewater-scraper/tree/main/wastewater
+
 import requests
 import tabula
 from bs4 import BeautifulSoup
