@@ -1,4 +1,4 @@
-// Worry level adjustments can be made here:
+// --- Worry level adjustments can be made here: --------------------
 covidNumberWorryLevels = [
   50, // Level 0. Below this and covid is "over" - do anything
   500, // Level 1. Below this and I can stop masking in stores etc
@@ -6,6 +6,13 @@ covidNumberWorryLevels = [
   2500 // Level 3. Be more careful about events, restaurants, etc
   // Above this = SURGE! Start staying home.
 ];
+
+// Days in which covid or booster was so recent I don't worry about anything
+covidRecentCutoff = 30;
+// Days in which covid or booster was so long ago I want to be extra cautious
+covidDistantCutoff = 250;
+
+// ------------------------------------------------------------------
 
 window.onload = () => {
   // Gather data
@@ -43,8 +50,11 @@ window.onload = () => {
   } else {
     worryLevel = 4; // Surge! Try to stay home
   }
-  if (daysSinceCovid  < 30 || daysSinceBooster < 30) {
+  if (daysSinceCovid  < covidRecentCutoff || daysSinceBooster < covidRecentCutoff) {
     worryLevel = 0;
+  }
+  if (daysSinceCovid > covidDistantCutoff && daysSinceBooster > covidDistantCutoff && worryLevel < 4) {
+    worryLevel++;
   }
 
   const eventMask = document.querySelector(".eventMask");
