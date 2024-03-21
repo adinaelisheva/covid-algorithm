@@ -74,7 +74,7 @@ window.onload = () => {
   const dining = document.querySelector('.dining');
   const wfh = document.querySelector('.wfh');
 
-  // Mask on the T and at events basically always
+  // Mask at events basically always
   if (worryLevel < 1) {
     eventMask.innerHTML = 'N';
     eventMask.classList.add('green');
@@ -83,6 +83,18 @@ window.onload = () => {
   } else {
     eventMask.innerHTML = 'Y';
     eventMask.classList.add('red');
+    tMask.innerHTML = 'Y';
+    tMask.classList.add('red');
+  }
+
+  // Mask on the T basically always, but less concerned if it's empty
+  if (worryLevel < 1) {
+    tMask.innerHTML = 'N';
+    tMask.classList.add('green');
+  } else if (worryLevel < 2) {
+    tMask.innerHTML = 'If busy';
+    tMask.classList.add('yellow');
+  } else {
     tMask.innerHTML = 'Y';
     tMask.classList.add('red');
   }

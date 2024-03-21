@@ -27,7 +27,10 @@ for i in reversed(page.index):
   south = page.at[i, 'south 7da']
   if not math.isnan(north) and not math.isnan(south):
     date = page.at[i, 'date']
-    amt = max(north, south)
+    # If north is higher, use it. Otherwise, an average
+    amt = (north + south) / 2
+    if (north > south):
+      amt = north
     break
 
 datastr = f'["{date}", {amt}]'
