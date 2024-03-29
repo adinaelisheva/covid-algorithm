@@ -1,0 +1,25 @@
+// Example personal.js. Fill in numbers that work for you
+
+PERSONAL_DATA = [
+  "1/1/2024", // Last booster
+  "1/1/2020", // Last COVID case
+];
+
+// --- Worry level adjustments can be made here: --------------------
+COVID_NUMBER_WORRY_LEVELS = [
+  500, // Level 0. Below this and covid is 'over' - do anything
+  1000, // Level 1. Below this and I can stop masking in stores etc
+  1500, // Level 2. Below this and I don't have to worry about restaurants
+  2000 // Level 3. Be more careful about events, restaurants, etc
+  // Above this = SURGE! Start staying home.
+];
+
+// Days in which covid or booster was so recent I don't worry about anything
+COVID_RECENT_CUTOFF = 30;
+// Days in which covid or booster was so long ago I want to be extra cautious
+COVID_DISTANT_CUTOFF = 250;
+
+COLOR_THRESHHOLDS = [
+  1000, // green below, yellow above
+  2000, // red above
+]
