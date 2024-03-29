@@ -1,24 +1,8 @@
-// --- Worry level adjustments can be made here: --------------------
-covidNumberWorryLevels = [
-  50, // Level 0. Below this and covid is 'over' - do anything
-  500, // Level 1. Below this and I can stop masking in stores etc
-  1000, // Level 2. Below this and I don't have to worry about restaurants
-  2500 // Level 3. Be more careful about events, restaurants, etc
-  // Above this = SURGE! Start staying home.
-];
-
-// Days in which covid or booster was so recent I don't worry about anything
-covidRecentCutoff = 30;
-// Days in which covid or booster was so long ago I want to be extra cautious
-covidDistantCutoff = 250;
-
-// ------------------------------------------------------------------
-
 window.onload = () => {
   // Gather data
   const covidNumbers = mwradata[1];
-  const lastCovid = Date.parse(personaldata[0]);
-  const lastBooster = Date.parse(personaldata[1]);
+  const lastCovid = Date.parse(PERSONAL_DATA[0]);
+  const lastBooster = Date.parse(PERSONAL_DATA[1]);
   const now = new Date().getTime();
 
   const msPerDay = 1000 * 60 * 60 * 24;
@@ -28,9 +12,9 @@ window.onload = () => {
   // Update fields
   document.querySelector('.date').innerHTML = mwradata[0];
   document.querySelector('.covidNums').innerHTML = covidNumbers;
-  if (covidNumbers < 1000) {
+  if (covidNumbers < COLOR_THRESHHOLDS[0]) {
     document.querySelector('.covidNums').classList.add('greenBg');
-  } else if(covidNumbers < 2000) {
+  } else if(covidNumbers < COLOR_THRESHHOLDS[1]) {
     document.querySelector('.covidNums').classList.add('yellowBg');
   } else {
     document.querySelector('.covidNums').classList.add('redBg');
@@ -39,32 +23,32 @@ window.onload = () => {
   document.querySelector('.sinceBooster').innerHTML = getFlexibleTimeString(daysSinceBooster);
 
   let worryLevel = 0;
-  if (covidNumbers < covidNumberWorryLevels[0]) {
+  if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[0]) {
     worryLevel = 0; // No worry at all
-  } else if (covidNumbers < covidNumberWorryLevels[1]) {
+  } else if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[1]) {
     worryLevel = 1; // Low worry - No need to mask in stores etc
-  } else if (covidNumbers < covidNumberWorryLevels[2]) {
+  } else if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[2]) {
     worryLevel = 2; // Regular worry - mask in stores but don't worry about eating out
-  } else if (covidNumbers < covidNumberWorryLevels[3]) {
+  } else if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[3]) {
     worryLevel = 3; // Slightly extra worry - try to eat out less
   } else {
     worryLevel = 4; // Surge! Try to stay home
   }
-  if (daysSinceCovid  < covidRecentCutoff) {
+  if (daysSinceCovid  < COVID_RECENT_CUTOFF) {
     worryLevel = 0;
     document.querySelector('.sinceCovid').classList.add('green');
   }
-  if (daysSinceBooster < covidRecentCutoff) {
+  if (daysSinceBooster < COVID_RECENT_CUTOFF) {
     worryLevel = 0;
     document.querySelector('.sinceBooster').classList.add('green');
   }
-  if (daysSinceCovid > covidDistantCutoff && daysSinceBooster > covidDistantCutoff && worryLevel < 4) {
+  if (daysSinceCovid > COVID_DISTANT_CUTOFF && daysSinceBooster > COVID_DISTANT_CUTOFF && worryLevel < 4) {
     worryLevel++;
   }
-  if (daysSinceCovid  > covidDistantCutoff) {
+  if (daysSinceCovid  > COVID_DISTANT_CUTOFF) {
     document.querySelector('.sinceCovid').classList.add('red');
   }
-  if (daysSinceBooster > covidDistantCutoff) {
+  if (daysSinceBooster > COVID_DISTANT_CUTOFF) {
     document.querySelector('.sinceBooster').classList.add('red');
   }
 
