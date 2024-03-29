@@ -23,3 +23,10 @@ COLOR_THRESHHOLDS = [
   1000, // green below, yellow above
   2000, // red above
 ]
+
+// A list of all tests with expiration dates to track if any are about to expire or if we need to get more
+TEST_EXPIRATION_DATES = [
+  "1/1/2025",
+  "6/1/2024",
+  "3/5/2024",
+]

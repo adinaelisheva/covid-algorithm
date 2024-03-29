@@ -8,6 +8,17 @@ window.onload = () => {
   const msPerDay = 1000 * 60 * 60 * 24;
   const daysSinceBooster = (now - lastBooster) / msPerDay;
   const daysSinceCovid = (now - lastCovid) / msPerDay;
+
+  nextTest = Infinity;
+  TEST_EXPIRATION_DATES.forEach((dateStr) => {
+    const date = Date.parse(dateStr);
+    if (date < nextTest && date > now) {
+      nextTest = dateStr;
+    }
+  });
+  if (nextTest === Infinity) {
+    nextTest = 'None! Buy more!';
+  }
   
   // Update fields
   document.querySelector('.date').innerHTML = mwradata[0];
@@ -21,6 +32,14 @@ window.onload = () => {
   }
   document.querySelector('.sinceCovid').innerHTML = getFlexibleTimeString(daysSinceCovid);
   document.querySelector('.sinceBooster').innerHTML = getFlexibleTimeString(daysSinceBooster);
+
+  const thirtyDays = 1000 * 60 * 60 * 24 * 30;
+  document.querySelector('.nextTestExpires').innerHTML = nextTest;
+  if (nextTest.startsWith('None')) {
+    document.querySelector('.nextTestExpires').classList.add('red');
+  } else if (Date.parse(nextTest) - now < thirtyDays) {
+    document.querySelector('.nextTestExpires').classList.add('yellow');
+  }
 
   let worryLevel = 0;
   if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[0]) {
