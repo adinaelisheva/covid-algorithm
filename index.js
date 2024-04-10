@@ -9,16 +9,15 @@ window.onload = () => {
   const daysSinceBooster = (now - lastBooster) / msPerDay;
   const daysSinceCovid = (now - lastCovid) / msPerDay;
 
-  nextTest = Infinity;
+  let nextTest = 'None! Buy more!';
+  let nextTestDate = Infinity;
   TEST_EXPIRATION_DATES.forEach((dateStr) => {
     const date = Date.parse(dateStr);
-    if (date < nextTest && date > now) {
+    if (date < nextTestDate && date > now) {
+      nextTestDate = date;
       nextTest = dateStr;
     }
   });
-  if (nextTest === Infinity) {
-    nextTest = 'None! Buy more!';
-  }
   
   // Update fields
   document.querySelector('.date').innerHTML = mwradata[0];
@@ -35,9 +34,9 @@ window.onload = () => {
 
   const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   document.querySelector('.nextTestExpires').innerHTML = nextTest;
-  if (nextTest.startsWith('None')) {
+  if (nextTestDate === Infinity) {
     document.querySelector('.nextTestExpires').classList.add('red');
-  } else if (Date.parse(nextTest) - now < thirtyDays) {
+  } else if (nextTestDate - now < thirtyDays) {
     document.querySelector('.nextTestExpires').classList.add('yellow');
   }
 

@@ -16,8 +16,12 @@ link = soup.select(f"a[href^='{LINK_PREFIX}'][href$='{LINK_SUFFIX}']")[0].attrs[
 pdf_url = base_url + link
 
 data = tabula.io.read_pdf(pdf_url, pages='all', lattice=True)
-page = data[len(data) - 1]
-page.columns = ['date', 'south', 'north', 'south 7da', 'north 7da', 'south lci', 'south hci', 'north lci', 'north hci']
+
+# find the last page with any data
+for page in reversed(data):
+  page.columns = ['date', 'south', 'north', 'south 7da', 'north 7da', 'south lci', 'south hci', 'north lci', 'north hci']
+  if not math.isnan(page.at[0, 'north 7da']):
+    break
 
 # find the last row with data - it's the most recent
 date = ''
