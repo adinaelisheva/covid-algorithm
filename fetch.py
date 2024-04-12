@@ -5,14 +5,14 @@ import tabula
 from bs4 import BeautifulSoup
 import math
 
-LINK_PREFIX = 'MWRAData'
+LINK_INFIX = 'MWRAData'
 LINK_SUFFIX = '-data.pdf'
 
 res = requests.get('https://www.mwra.com/biobot/biobotdata.htm')
 base_url = '/'.join(res.url.split('/')[:-1]) + '/'
 
 soup = BeautifulSoup(res.text, 'html.parser')
-link = soup.select(f"a[href^='{LINK_PREFIX}'][href$='{LINK_SUFFIX}']")[0].attrs['href']
+link = soup.select(f"a[href*='{LINK_INFIX}'][href$='{LINK_SUFFIX}']")[0].attrs['href']
 pdf_url = base_url + link
 
 data = tabula.io.read_pdf(pdf_url, pages='all', lattice=True)
