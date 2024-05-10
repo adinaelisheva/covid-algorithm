@@ -1,8 +1,8 @@
 // Example personal.js. Fill in numbers that work for you
 
 PERSONAL_DATA = [
-  "1/1/2024", // Last booster
   "1/1/2020", // Last COVID case
+  "1/1/2024", // Last booster
 ];
 
 // --- Worry level adjustments can be made here: --------------------
