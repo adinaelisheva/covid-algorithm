@@ -25,7 +25,7 @@ print('got data from biobot site')
 # find the last page with any data
 index = 0
 for page in reversed(data):
-  print('checking page', index, 'for data')
+  print(f'checking page {index} for data')
   index = index + 1
   page.columns = ['date', 'south', 'north', 'south 7da', 'north 7da', 'south lci', 'south hci', 'north lci', 'north hci']
   if not math.isnan(page.at[0, 'north 7da']):
@@ -37,9 +37,11 @@ print('got page with data')
 date = ''
 amt = 0
 for i in reversed(page.index):
-  print('looking at row', i)
+  date = page.at[i, 'date']
+  print(f'looking at row{i}: {date}')
   north = page.at[i, 'north 7da']
   south = page.at[i, 'south 7da']
+  print(f'north is {north} and south is {south}')
   if not math.isnan(north) and not math.isnan(south):
     print('got data')
     date = page.at[i, 'date']
@@ -55,4 +57,4 @@ datastr = f'["{date}", {amt}]'
 with open('mwra.js', 'w') as f:
   f.write('mwradata = ' + datastr)
 
-print('Wrote:', datastr)
+print(f'Wrote: {datastr}')
