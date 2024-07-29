@@ -24,12 +24,22 @@ print('got data from biobot site')
 
 # find the last page with any data
 index = 0
+found = False
 for page in reversed(data):
   print(f'checking page {index} for data')
   index = index + 1
-  page.columns = ['date', 'south', 'north', 'south 7da', 'north 7da', 'south lci', 'south hci', 'north lci', 'north hci']
-  if not math.isnan(page.at[0, 'north 7da']):
-    break
+  try:
+    page.columns = ['date', 'south', 'north', 'south 7da', 'north 7da', 'south lci', 'south hci', 'north lci', 'north hci']
+  except:
+    continue
+  if math.isnan(page.at[0, 'north 7da']):
+    continue
+  found = True
+  break
+
+if not found:
+  print('no pages with valid data found')
+  quit()
 
 print('got page with data')
 
