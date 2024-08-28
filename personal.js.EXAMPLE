@@ -8,9 +8,9 @@ PERSONAL_DATA = [
 // --- Worry level adjustments can be made here: --------------------
 COVID_NUMBER_WORRY_LEVELS = [
   500, // Level 0. Below this and covid is 'over' - do anything
-  1000, // Level 1. Below this and I can stop masking in stores etc
-  1500, // Level 2. Below this and I don't have to worry about restaurants
-  2000 // Level 3. Be more careful about events, restaurants, etc
+  1000, // Level 1. Below this and I can stop masking as much
+  1500, // Level 2. Below this and I don't have to worry about restaurants, stores, etc
+  2000 // Level 3. Below this, be more careful about events, restaurants, etc
   // Above this = SURGE! Start staying home.
 ];
 

@@ -8,15 +8,15 @@ from datetime import datetime
 
 print('fetching covid data at', datetime.now())
 
-LINK_INFIX = 'MWRAData'
-LINK_SUFFIX = '-data.pdf'
+LINK_INFIX = 'mwradata'
+LINK_SUFFIX = '-data'
+BASE_URL = 'https://www.mwra.com'
 
-res = requests.get('https://www.mwra.com/biobot/biobotdata.htm')
-base_url = '/'.join(res.url.split('/')[:-1]) + '/'
+res = requests.get(BASE_URL + '/biobot/biobotdata.htm')
 
 soup = BeautifulSoup(res.text, 'html.parser')
 link = soup.select(f"a[href*='{LINK_INFIX}'][href$='{LINK_SUFFIX}']")[0].attrs['href']
-pdf_url = base_url + link
+pdf_url = BASE_URL + link
 
 data = tabula.io.read_pdf(pdf_url, pages='all', lattice=True)
 

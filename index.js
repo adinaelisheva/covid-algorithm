@@ -2,11 +2,11 @@ window.onload = () => {
   // Gather data
   const covidNumbers = mwradata[1];
   const lastCovid = Date.parse(PERSONAL_DATA[0]);
-  const lastBooster = Date.parse(PERSONAL_DATA[1]);
+  let lastBooster = Date.parse(PERSONAL_DATA[1]);
   const now = new Date().getTime();
 
   const msPerDay = 1000 * 60 * 60 * 24;
-  const daysSinceBooster = (now - lastBooster) / msPerDay;
+  let daysSinceBooster = (now - lastBooster) / msPerDay;
   const daysSinceCovid = (now - lastCovid) / msPerDay;
 
   let nextTest = 'None! Buy more!';
@@ -31,6 +31,11 @@ window.onload = () => {
   }
   document.querySelector('.sinceCovid').innerHTML = getFlexibleTimeString(daysSinceCovid);
   document.querySelector('.sinceBooster').innerHTML = getFlexibleTimeString(daysSinceBooster);
+  if (daysSinceBooster < 10) {
+    // Still cooking. For the math, assume it's out of the picture
+    daysSinceBooster = Infinity;
+  }
+
 
   const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   document.querySelector('.nextTestExpires').innerHTML = nextTest;
@@ -44,11 +49,11 @@ window.onload = () => {
   if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[0]) {
     worryLevel = 0; // No worry at all
   } else if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[1]) {
-    worryLevel = 1; // Low worry - No need to mask in stores etc
+    worryLevel = 1; // Low worry - No need to mask in most places
   } else if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[2]) {
-    worryLevel = 2; // Regular worry - mask in stores but don't worry about eating out
+    worryLevel = 2; // Regular worry - mask in crowds but don't worry too much
   } else if (covidNumbers < COVID_NUMBER_WORRY_LEVELS[3]) {
-    worryLevel = 3; // Slightly extra worry - try to eat out less
+    worryLevel = 3; // Slightly extra worry - try to be more careful
   } else {
     worryLevel = 4; // Surge! Try to stay home
   }
@@ -63,10 +68,12 @@ window.onload = () => {
   if (daysSinceCovid > COVID_DISTANT_CUTOFF && daysSinceBooster > COVID_DISTANT_CUTOFF && worryLevel < 4) {
     worryLevel++;
   }
-  if (daysSinceCovid  > COVID_DISTANT_CUTOFF) {
+  // Only mark the "distant" items as red if it's worth worrying about
+  const sixMonthDays = thirtyDays * 6;
+  if (daysSinceCovid  > COVID_DISTANT_CUTOFF && daysSinceBooster >= sixMonthDays) {
     document.querySelector('.sinceCovid').classList.add('red');
   }
-  if (daysSinceBooster > COVID_DISTANT_CUTOFF) {
+  if (daysSinceBooster > COVID_DISTANT_CUTOFF && daysSinceBooster !== Infinity && daysSinceCovid >= sixMonthDays) {
     document.querySelector('.sinceBooster').classList.add('red');
   }
 
@@ -77,23 +84,19 @@ window.onload = () => {
   const wfh = document.querySelector('.wfh');
 
   // Mask at events basically always
-  if (worryLevel < 1) {
+  if (worryLevel === 0) {
     eventMask.innerHTML = 'N';
     eventMask.classList.add('green');
-    tMask.innerHTML = 'N';
-    tMask.classList.add('green');
   } else {
     eventMask.innerHTML = 'Y';
     eventMask.classList.add('red');
-    tMask.innerHTML = 'Y';
-    tMask.classList.add('red');
   }
 
   // Mask on the T basically always, but less concerned if it's empty
-  if (worryLevel < 1) {
+  if (worryLevel === 0) {
     tMask.innerHTML = 'N';
     tMask.classList.add('green');
-  } else if (worryLevel < 2) {
+  } else if (worryLevel === 1) {
     tMask.innerHTML = 'If busy';
     tMask.classList.add('yellow');
   } else {
@@ -101,7 +104,7 @@ window.onload = () => {
     tMask.classList.add('red');
   }
 
-  if (worryLevel < 2) {
+  if (worryLevel <= 2) {
     storeMask.innerHTML = 'N';
     storeMask.classList.add('green');
   } else {
@@ -109,10 +112,10 @@ window.onload = () => {
     storeMask.classList.add('red');
   }
 
-  if (worryLevel < 3) {
+  if (worryLevel <= 2) {
     dining.innerHTML = 'Y';
     dining.classList.add('green');
-  } else if (worryLevel < 4) {
+  } else if (worryLevel === 3) {
     dining.innerHTML = 'rarely';
     dining.classList.add('yellow');
   } else {
@@ -120,7 +123,7 @@ window.onload = () => {
     dining.classList.add('red');
   }
 
-  if (worryLevel < 4) {
+  if (worryLevel <= 3) {
     wfh.innerHTML = 'N';
     wfh.classList.add('green');
   } else {
@@ -131,6 +134,10 @@ window.onload = () => {
 }
 
 function getFlexibleTimeString(days) {
+  days = Math.floor(days);
+  if (days === Infinity) {
+    return 'Undeterminable';
+  }
   if (days < 14) {
     return days + ' days';
   }
