@@ -83,52 +83,25 @@ window.onload = () => {
   const dining = document.querySelector('.dining');
   const wfh = document.querySelector('.wfh');
 
-  // Mask at events basically always
-  if (worryLevel === 0) {
-    eventMask.innerHTML = 'N';
-    eventMask.classList.add('green');
-  } else {
-    eventMask.innerHTML = 'Y';
-    eventMask.classList.add('red');
-  }
-
-  // Mask on the T basically always, but less concerned if it's empty
-  if (worryLevel === 0) {
-    tMask.innerHTML = 'N';
-    tMask.classList.add('green');
-  } else if (worryLevel === 1) {
-    tMask.innerHTML = 'If busy';
-    tMask.classList.add('yellow');
-  } else {
-    tMask.innerHTML = 'Y';
-    tMask.classList.add('red');
-  }
-
-  if (worryLevel <= 2) {
-    storeMask.innerHTML = 'N';
-    storeMask.classList.add('green');
-  } else {
-    storeMask.innerHTML = 'Y';
-    storeMask.classList.add('red');
-  }
-
-  if (worryLevel <= 2) {
-    dining.innerHTML = 'Y';
-    dining.classList.add('green');
-  } else if (worryLevel === 3) {
-    dining.innerHTML = 'rarely';
-    dining.classList.add('yellow');
-  } else {
-    dining.innerHTML = 'N';
-    dining.classList.add('red');
-  }
-
-  if (worryLevel <= 3) {
-    wfh.innerHTML = 'N';
-    wfh.classList.add('green');
-  } else {
-    wfh.innerHTML = 'Y';
-    wfh.classList.add('red');
+  const table = document.querySelector('.eventTable');
+  for (item of ACTIVITY_LEVELS) {
+    const row = document.createElement('tr');
+    const nameCell = document.createElement('td');
+    nameCell.innerText = item.name;
+    row.appendChild(nameCell);
+    const worryCell = document.createElement('td');
+    if (worryLevel <= item.noWorryLevel) {
+      worryCell.innerText = item.noWorryString || 'N';
+      worryCell.classList.add('green');
+    } else if (item.someWorryLevel && worryLevel <= item.someWorryLevel) {
+      worryCell.innerText = item.someWorryString || 'M';
+      worryCell.classList.add('yellow');
+    } else {
+      worryCell.innerText = item.allWorryString || 'Y';
+      worryCell.classList.add('red');
+    }
+    row.appendChild(worryCell);
+    table.appendChild(row);
   }
 
 }

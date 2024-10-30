@@ -14,6 +14,19 @@ COVID_NUMBER_WORRY_LEVELS = [
   // Above this = SURGE! Start staying home.
 ];
 
+// --- List activities and levels here
+// If no strings are specified, defaults to 'Y', 'M', and 'N'
+// Middle level can be skipped ("someWorryLevel")
+ACTIVITY_LEVELS = [
+  {
+    name: "Masking in stores",
+    noWorryLevel: 0,
+    someWorryLevel: 1,
+    someWorryString: "if busy",
+    allWorryString: "n95",
+  }
+]
+
 // Days in which covid or booster was so recent I don't worry about anything
 COVID_RECENT_CUTOFF = 30;
 // Days in which covid or booster was so long ago I want to be extra cautious
