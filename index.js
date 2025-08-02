@@ -1,9 +1,14 @@
 window.onload = () => {
   // Gather data
-  const covidNumbers = mwradata[1];
+  const covidNumbers = coviddata[1];
   const lastCovid = Date.parse(PERSONAL_DATA[0]);
   let lastBooster = Date.parse(PERSONAL_DATA[1]);
   const now = new Date().getTime();
+
+  // Since mass.gov has both "Minimal" and "Low", shift everything
+  const fluLevel = Math.max(fludata[1] - 1, 0);
+  const fluLevels = ["Low", "Moderate", "High", "Very High"];
+  const fluLevelStr = fluLevels[fluLevel];
 
   const msPerDay = 1000 * 60 * 60 * 24;
   let daysSinceBooster = (now - lastBooster) / msPerDay;
@@ -20,7 +25,7 @@ window.onload = () => {
   });
   
   // Update fields
-  document.querySelector('.date').innerHTML = mwradata[0];
+  document.querySelector('.coviddatadate').innerHTML = coviddata[0];
   document.querySelector('.covidNums').innerHTML = covidNumbers;
   if (covidNumbers < COLOR_THRESHHOLDS[0]) {
     document.querySelector('.covidNums').classList.add('greenBg');
@@ -29,13 +34,23 @@ window.onload = () => {
   } else {
     document.querySelector('.covidNums').classList.add('redBg');
   }
+
+  document.querySelector('.fludatadate').innerHTML = fludata[0];
+  document.querySelector('.fluLevel').innerHTML = fluLevelStr;
+  if (fluLevel < 1) {
+    document.querySelector('.fluLevel').classList.add('greenBg');
+  } else if(fluLevel < 2) {
+    document.querySelector('.fluLevel').classList.add('yellowBg');
+  } else {
+    document.querySelector('.fluLevel').classList.add('redBg');
+  }
+
   document.querySelector('.sinceCovid').innerHTML = getFlexibleTimeString(daysSinceCovid);
   document.querySelector('.sinceBooster').innerHTML = getFlexibleTimeString(daysSinceBooster);
   if (daysSinceBooster < 10) {
     // Still cooking. For the math, assume it's out of the picture
     daysSinceBooster = Infinity;
   }
-
 
   const thirtyDays = 1000 * 60 * 60 * 24 * 30;
   document.querySelector('.nextTestExpires').innerHTML = nextTest;
@@ -68,6 +83,11 @@ window.onload = () => {
   if (daysSinceCovid > COVID_DISTANT_CUTOFF && daysSinceBooster > COVID_DISTANT_CUTOFF && worryLevel < 4) {
     worryLevel++;
   }
+  if (fluLevel > worryLevel) {
+    worryLevel = fluLevel;
+  }
+
+
   // Only mark the "distant" items as red if it's worth worrying about
   const sixMonthDays = thirtyDays * 6;
   if (daysSinceCovid  > COVID_DISTANT_CUTOFF && daysSinceBooster >= sixMonthDays) {
@@ -76,12 +96,6 @@ window.onload = () => {
   if (daysSinceBooster > COVID_DISTANT_CUTOFF && daysSinceBooster !== Infinity && daysSinceCovid >= sixMonthDays) {
     document.querySelector('.sinceBooster').classList.add('red');
   }
-
-  const eventMask = document.querySelector('.eventMask');
-  const tMask = document.querySelector('.tMask');
-  const storeMask = document.querySelector('.storeMask');
-  const dining = document.querySelector('.dining');
-  const wfh = document.querySelector('.wfh');
 
   const table = document.querySelector('.eventTable');
   for (item of ACTIVITY_LEVELS) {
