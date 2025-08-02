@@ -78,7 +78,7 @@ data = pandas.read_excel(FLURL, sheet_name=FLU_SHEET_NAME)
 
 print('\n\ngot flu data from mass.gov site')
 
-i = 1
+i = data.shape[0] - 1; # index of the last row
 latestdate = data[FLU_DATE_COL].iloc[i].strftime("%m/%d/%Y")
 maxlevel = 0
 while True:
@@ -94,7 +94,7 @@ while True:
 
   if level > maxlevel:
     maxlevel = level
-  i += 1
+  i -= 1
 
 fludatastr = f'["{latestdate}", {level}]'
 
