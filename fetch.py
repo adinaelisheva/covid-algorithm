@@ -8,7 +8,7 @@ from datetime import datetime
 import pandas
 
 MWRA_LINK_INFIX = 'mwradata'
-MWRA_LINK_SUFFIX = '-datapdf'
+MWRA_LINK_SUFFIX = '-data'
 MWRA_BASE_URL = 'https://www.mwra.com'
 
 FLURL = 'https://www.mass.gov/doc/flu-dashboard-data/download'
@@ -22,10 +22,14 @@ FLU_ACTIVITY_COL = 'Activity level'
 
 print('fetching data at', datetime.now())
 
-res = requests.get(MWRA_BASE_URL + '/biobot/biobotdata.htm')
+url = MWRA_BASE_URL + '/biobot/biobotdata.htm'
+print('navigating to', url)
+res = requests.get(url)
 
 soup = BeautifulSoup(res.text, 'html.parser')
-link = soup.select(f"a[href*='{MWRA_LINK_INFIX}'][href$='{MWRA_LINK_SUFFIX}']")[0].attrs['href']
+selector = f"a[href*='{MWRA_LINK_INFIX}'][href*='{MWRA_LINK_SUFFIX}']"
+print('attempting to select pdf via ', selector)
+link = soup.select(selector)[0].attrs['href']
 pdf_url = MWRA_BASE_URL + link
 
 data = tabula.io.read_pdf(pdf_url, pages='all', lattice=True)
