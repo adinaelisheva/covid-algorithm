@@ -14,6 +14,7 @@ MWRA_BASE_URL = 'https://www.mwra.com'
 FLURL = 'https://www.mass.gov/doc/flu-dashboard-data/download'
 FLU_SHEET_NAME = 'Regional Activity'
 FLU_LEVEL_STRS = ['Minimal', 'Low', 'Moderate', 'High', 'Very High']
+FLU_RELEVANT_REGIONS = ['Boston', 'Inner Metro Boston', 'Northeast', 'Outer Metro Boston']
 FLU_DATE_COL = 'Week End Date'
 FLU_REGION_COL = 'Region Name'
 FLU_ACTIVITY_COL = 'Activity level'
@@ -92,6 +93,10 @@ while True:
     print('Data collection done')
     break
   location = data[FLU_REGION_COL].iloc[i]
+  if location not in FLU_RELEVANT_REGIONS:
+    print(f'Skipping {location}')
+    i -= 1
+    continue
   levelstr = data[FLU_ACTIVITY_COL].iloc[i]
   level = FLU_LEVEL_STRS.index(levelstr)
   print(f'{location} is {levelstr}')
@@ -100,7 +105,7 @@ while True:
     maxlevel = level
   i -= 1
 
-fludatastr = f'["{latestdate}", {level}]'
+fludatastr = f'["{latestdate}", {maxlevel}]'
 
 # put everything in the file
 with open('data.js', 'w') as f:
