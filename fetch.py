@@ -1,15 +1,15 @@
 # Modified from https://github.com/harrislapiroff/mwra-wastewater-scraper/tree/main/wastewater
 
 import requests
-import tabula
+import pymupdf
 from bs4 import BeautifulSoup
 import math
 from datetime import datetime
 import pandas
+import re
 
-MWRA_LINK_INFIX = 'mwradata'
-MWRA_LINK_SUFFIX = '-data'
-MWRA_BASE_URL = 'https://www.mwra.com'
+COV_BASE_URL = 'https://boston.gov'
+COV_LINK_SUFFIX = 'ww_resp_report.pdf'
 
 FLURL = 'https://www.mass.gov/doc/flu-dashboard-data/download'
 FLU_SHEET_NAME = 'Regional Activity'
@@ -18,65 +18,44 @@ FLU_RELEVANT_REGIONS = ['Boston', 'Inner Metro Boston', 'Northeast', 'Outer Metr
 FLU_DATE_COL = 'Week End Date'
 FLU_REGION_COL = 'Region Name'
 FLU_ACTIVITY_COL = 'Activity level'
+NOW = datetime.now()
 
 ### Get COVID data
 
-print('fetching data at', datetime.now())
+print('fetching data at', NOW)
 
-url = MWRA_BASE_URL + '/biobot/biobotdata.htm'
+url = COV_BASE_URL + '/government/cabinets/boston-public-health-commission/boston-wastewater-monitoring'
 print('navigating to', url)
 res = requests.get(url)
-
 soup = BeautifulSoup(res.text, 'html.parser')
-selector = f"a[href*='{MWRA_LINK_INFIX}'][href*='{MWRA_LINK_SUFFIX}']"
-print('attempting to select pdf via ', selector)
-link = soup.select(selector)[0].attrs['href']
-pdf_url = MWRA_BASE_URL + link
 
-data = tabula.io.read_pdf(pdf_url, pages='all', lattice=True)
+selectorBase = f"a[href*='{COV_LINK_SUFFIX}']"
+print('attempting to select pdf via ', selectorBase, ' for the most recent date:')
+dateStr = NOW.strftime("/%Y-%m-")
+dayNum = NOW.day
 
-print('\n\ngot data from biobot site')
-
-# find the last page with any data
-index = 0
-found = False
-for page in reversed(data):
-  print(f'checking page {index} for data')
-  index = index + 1
-  try:
-    page.columns = ['date', 'south', 'north', 'south 7da', 'north 7da', 'south lci', 'south hci', 'north lci', 'north hci']
-  except:
-    continue
-  if math.isnan(page.at[0, 'north 7da']):
-    continue
-  found = True
-  break
-
-if not found:
-  print('no pages with valid data found')
-  quit()
-
-print('got page with data')
-
-# find the last row with data - it's the most recent
-date = ''
-amt = 0
-for i in reversed(page.index):
-  date = page.at[i, 'date']
-  print(f'looking at row{i}: {date}')
-  north = page.at[i, 'north 7da']
-  south = page.at[i, 'south 7da']
-  print(f'north is {north} and south is {south}')
-  if not math.isnan(north) and not math.isnan(south):
-    print('got data')
-    date = page.at[i, 'date']
-    # If north is higher, use it. Otherwise, an average
-    amt = (north + south) / 2
-    if (north > south):
-      amt = north
+print(f'Checking {dateStr}{dayNum}...')
+pdfAnchor = soup.select(selectorBase + f"[href*='{dateStr}{dayNum}']")
+while len(pdfAnchor) == 0:
+  dayNum = 31 if dayNum == 0 else dayNum - 1
+  if dayNum == NOW.day:
+    # We've looped all the way around; abort
     break
+  print(f'Checking {dateStr}{dayNum}...')
+  pdfAnchor = soup.select(selectorBase + f"[href*='{dateStr}{dayNum}']")
+print('Found.')
+pdfUrl = COV_BASE_URL + pdfAnchor[0].attrs['href']
 
-coviddatastr = f'["{date}", {amt}]'
+r = requests.get(pdfUrl)
+data = r.content
+doc = pymupdf.Document(stream=data)
+
+print('\n\ngot data from Boston site')
+exp = re.search('samples ?through([^\\n]+)',doc[2].get_text())
+coviddatestr = datetime.strptime(exp.group(1).strip(), "%d-%b-%Y").strftime("%m/%d/%Y")
+exp = re.search('\\n(\\d+) copies/mL',doc[2].get_text())
+amt = exp.group(1)
+coviddatastr = f'["{coviddatestr}", {amt}]'
 
 # Now get flu data
 data = pandas.read_excel(FLURL, sheet_name=FLU_SHEET_NAME)
