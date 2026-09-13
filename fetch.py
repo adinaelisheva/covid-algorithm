@@ -51,9 +51,9 @@ data = r.content
 doc = pymupdf.Document(stream=data)
 
 print('\n\ngot data from Boston site')
-exp = re.search('samples ?through([^\\n]+)',doc[2].get_text())
+exp = re.search('Data Complete Through: ([^\\n]+)',doc[0].get_text())
 coviddatestr = datetime.strptime(exp.group(1).strip(), "%d-%b-%Y").strftime("%m/%d/%Y")
-exp = re.search('\\n(\\d+) copies/mL',doc[2].get_text())
+exp = re.search('\\d+-(\\d+)\\s+RNA copies/mL\\s+RANGE ACROSS',doc[3].get_text())
 amt = exp.group(1)
 coviddatastr = f'["{coviddatestr}", {amt}]'
 
