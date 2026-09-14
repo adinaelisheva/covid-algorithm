@@ -3,7 +3,6 @@
 import requests
 import pymupdf
 from bs4 import BeautifulSoup
-import math
 from datetime import datetime
 import pandas
 import re
